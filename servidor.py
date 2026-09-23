@@ -1,7 +1,8 @@
 import socket
 from encriptacion import obtener_o_generar_clave, desencriptar_bytes, recibir_mensaje_socket, enviar_mensaje_socket
 
-HOST = '127.0.0.1'
+# Usar 0.0.0.0 para escuchar todas las conexiones
+HOST = '0.0.0.0'
 PORT = 5000
 
 def iniciar_servidor():

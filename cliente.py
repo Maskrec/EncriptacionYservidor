@@ -8,8 +8,13 @@ from encriptacion import (
     recibir_mensaje_socket
 )
 
-HOST = '127.0.0.1'
+DEFAULT_HOST = '127.0.0.1'
 PORT = 5000
+
+def pedir_ip_servidor() -> str:
+    """Pide al usuario la dirección IP del servidor."""
+    ip = input("Ingresa la IP del servidor (Enter para usar '127.0.0.1'): ").strip()
+    return ip if ip else DEFAULT_HOST
 
 def pedir_ruta_imagen() -> str:
     """Pide al usuario la ruta de una imagen existente en disco."""
@@ -23,10 +28,13 @@ def pedir_ruta_imagen() -> str:
         else:
             print(f"el archivo '{ruta}' no existe intenta de nuevo.")
 
-def ejecutar_cliente(ruta_imagen=None):
+def ejecutar_cliente(ruta_imagen=None, host_ip=None):
     print("       ENCRIPTACIÓN Y VERIFICACIÓN DE IMAGENES   ")
     
-    
+    # Pedir IP del servidor si no fue proporcionada
+    if not host_ip:
+        host_ip = pedir_ip_servidor()
+
     # 1 seleccinar imagen
     if not ruta_imagen or not os.path.exists(ruta_imagen):
         ruta_imagen = pedir_ruta_imagen()
@@ -50,11 +58,11 @@ def ejecutar_cliente(ruta_imagen=None):
     print("guardada copia local en 'imagen_encriptada.enc'")
     
     # 4 transmision al servidor via Socket TCP
-    print(f"conectando al servidor {HOST}:{PORT}")
+    print(f"conectando al servidor {host_ip}:{PORT}")
     datos_recibidos = b""
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.connect((HOST, PORT))
+            sock.connect((host_ip, PORT))
             print("enviando imagen encriptada al servidor")
             enviar_mensaje_socket(sock, datos_encriptados)
             
