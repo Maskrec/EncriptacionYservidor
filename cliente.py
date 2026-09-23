@@ -11,9 +11,9 @@ from encriptacion import (
 DEFAULT_HOST = '127.0.0.1'
 PORT = 5000
 
-def pedir_ip_servidor() -> str:
+def pedir_ip_servidor() -> str: #str sirve para indicar que el valor devuelto sera una cadena de texto
     """Pide al usuario la dirección IP del servidor."""
-    ip = input("Ingresa la IP del servidor (Enter para usar '127.0.0.1'): ").strip()
+    ip = input("Ingresa la IP del servidor (Enter para usar localhost o '127.0.0.1'): ").strip()
     return ip if ip else DEFAULT_HOST
 
 def pedir_ruta_imagen() -> str:
