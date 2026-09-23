@@ -9,7 +9,7 @@ from encriptacion import (
 )
 
 DEFAULT_HOST = '127.0.0.1'
-PORT = 5000
+PORT = 5010
 
 def pedir_ip_servidor() -> str: #str sirve para indicar que el valor devuelto sera una cadena de texto
     """Pide al usuario la dirección IP del servidor."""
@@ -63,38 +63,31 @@ def ejecutar_cliente(ruta_imagen=None, host_ip=None):
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect((host_ip, PORT))
-            print("enviando imagen encriptada al servidor")
+            print("enviando imagen encriptada al servidor...")
             enviar_mensaje_socket(sock, datos_encriptados)
             
-            # 5recepcion de la imagen desencriptada enviada por el servidor
-            print("Esperando respuesta del servidor")
+            # 5 recepcion de la confirmación del servidor
+            print("Esperando confirmación del servidor...")
             datos_recibidos = recibir_mensaje_socket(sock)
-            print(f"         Respuesta recibida del servidor: {len(datos_recibidos)} bytes.")
             
     except (ConnectionRefusedError, ConnectionResetError, OSError, socket.error) as e:
         print(f"CLIENTE ERROR No se pudo conectar al servidor Asegurate de ejecutar 'servidor.py' primero. ({e})")
         return
 
     if not datos_recibidos:
-        print("CLIENTE ERROR No se recibieron datos del servidor.")
+        print("CLIENTE ERROR No se recibió respuesta del servidor.")
         return
 
-    # 6 guardar imagen recuperada
-    ruta_recuperada = "imagen_recuperada.png"
-    with open(ruta_recuperada, "wb") as f:
-        f.write(datos_recibidos)
-    print(f" imagen desencriptada guardada en '{ruta_recuperada}'")
-    
-    # 7verificacion de integridad
-    hash_recuperado = calcular_hash_bytes(datos_recibidos)
-    print(f" Hash recuperado: {hash_recuperado}")
-    
-    print("               RESULTADO DE LA VERIFICACION")
-    
-    if hash_original == hash_recuperado:
-        print(" exito las imagenes  son identicas.")
-    else:
-        print(" error los hashes no coinciden.")
+    # 6 procesar confirmacion
+    try:
+        mensaje_servidor = datos_recibidos.decode('utf-8')
+        print(f"\n[RESPUESTA DEL SERVIDOR] {mensaje_servidor}")
+    except UnicodeDecodeError:
+        print(f"[RESPUESTA DEL SERVIDOR] (Datos binarios recibidos: {len(datos_recibidos)} bytes)")
+
+    print("\n               RESULTADO DE LA TRANSMISIÓN")
+    print(f" Hash original enviado: {hash_original}")
+    print(" Transmisión completada. La imagen fue desencriptada y almacenada únicamente en el servidor.")
     print("=" * 60)
 
 def menu_principal():

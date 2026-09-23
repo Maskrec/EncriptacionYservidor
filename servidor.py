@@ -1,6 +1,6 @@
 import socket
 from cryptography.fernet import InvalidToken
-from encriptacion import obtener_o_generar_clave, desencriptar_bytes, recibir_mensaje_socket, enviar_mensaje_socket
+from encriptacion import obtener_o_generar_clave, desencriptar_bytes, recibir_mensaje_socket, enviar_mensaje_socket, calcular_hash_bytes
 
 # Usar 0.0.0.0 para escuchar todas las conexiones
 HOST = '0.0.0.0'
@@ -40,12 +40,21 @@ def iniciar_servidor():
                         # 2. Desencriptar autónomamente los bytes de la imagen
                         print("servidor: Desencriptando imagen con la clave Fernet...")
                         datos_desencriptados = desencriptar_bytes(datos_encriptados, clave)
-                        print(f"servidor: Imagen desencriptada exitosamente. Tamaño final: {len(datos_desencriptados)} bytes.")
+                        hash_desencriptado = calcular_hash_bytes(datos_desencriptados)
+                        print(f"servidor: Imagen desencriptada exitosamente. Tamaño: {len(datos_desencriptados)} bytes.")
+                        print(f"servidor: Hash SHA-256 de la imagen desencriptada: {hash_desencriptado}")
                         
-                        # 3. Retornar autónomamente la imagen desencriptada al cliente
-                        print("servidor: Enviando imagen desencriptada de regreso al cliente...")
-                        enviar_mensaje_socket(conn, datos_desencriptados)
-                        print("servidor: Transmision de respuesta completada.\n")
+                        # 3. Guardar la imagen desencriptada en el servidor
+                        ruta_guardado = "imagen_desencriptada_servidor.png"
+                        with open(ruta_guardado, "wb") as f:
+                            f.write(datos_desencriptados)
+                        print(f"servidor: Imagen guardada localmente en '{ruta_guardado}'.")
+                        
+                        # 4. Enviar respuesta de confirmación al cliente (no los bytes de la imagen)
+                        mensaje_confirmacion = "OK: Imagen recibida, desencriptada y guardada en el servidor.".encode('utf-8')
+                        print("servidor: Enviando confirmación al cliente...")
+                        enviar_mensaje_socket(conn, mensaje_confirmacion)
+                        print("servidor: Transmisión de respuesta completada.\n")
                     except InvalidToken:
                         print("ERROR: La clave de encriptación 'clave.key' del cliente no coincide con la del servidor.")
                     except (ConnectionResetError, ConnectionAbortedError) as e:
