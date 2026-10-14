@@ -1,3 +1,26 @@
+# Ignorar archivos Markdown
+*.md
+*md
+
+# Entornos virtuales
 .venv/
+venv/
+
+# Cache y temporales de Python
 __pycache__/
+*__pycache__
 *.py[cod]
+*$py.class
+
+# Archivos de pruebas locales
+pygsti/test_fase1_fase2.py
+
+# Imagenes y archivos multimedia generados
+*.png
+*.jpg
+*png
+*jpg
+
+# Llaves y credenciales
+*.key
+*key
